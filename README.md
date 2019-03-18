@@ -1,9 +1,9 @@
-# Go Cheat Sheet
+# Go 小抄
 
-# Index
-1. [Basic Syntax](#basic-syntax)
-2. [Operators](#operators)
-    * [Arithmetic](#arithmetic)
+# 索引
+1. [基础语法](#基础语法)
+2. [操作符](#操作符)
+    * [运算符](#arithmetic)
     * [Comparison](#comparison)
     * [Logical](#logical)
     * [Other](#other)
@@ -50,7 +50,7 @@
 * 命令式编程
 * 静态类型
 * 类似 C 的语法结构（但没有括号和分号）和 Oberon-2 的结构
-* 编译成机器码（没有 JVM）
+* 编译成机器码（没有虚拟机）
 * 没有类，但是有带方法的结构体
 * 接口
 * 没有继承。有 [类型嵌入](http://golang.org/doc/effective%5Fgo.html#embedding)
@@ -58,9 +58,9 @@
 * 函数可以有多个返回值
 * 有闭包
 * 有指针，但不支持指针运算
-* 内置并发特性：Goroutines 和 Channels
+* 原生支持并发：Goroutines 和 Channels
 
-# Basic Syntax
+# 基础语法
 
 ## Hello World
 File `hello.go`:
@@ -75,8 +75,8 @@ func main() {
 ```
 `$ go run hello.go`
 
-## Operators
-### Arithmetic
+## 操作符
+### 运算符
 |Operator|Description|
 |--------|-----------|
 |`+`|addition|
