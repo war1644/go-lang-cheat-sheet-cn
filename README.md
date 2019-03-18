@@ -44,20 +44,20 @@
 Most example code taken from [A Tour of Go](http://tour.golang.org/), which is an excellent introduction to Go.
 If you're new to Go, do that tour. Seriously.
 
-## Go in a Nutshell
+## Go 特性概览
 
-* Imperative language
-* Statically typed
-* Syntax tokens similar to C (but less parentheses and no semicolons) and the structure to Oberon-2
-* Compiles to native code (no JVM)
-* No classes, but structs with methods
-* Interfaces
-* No implementation inheritance. There's [type embedding](http://golang.org/doc/effective%5Fgo.html#embedding), though.
-* Functions are first class citizens
-* Functions can return multiple values
-* Has closures
-* Pointers, but not pointer arithmetic
-* Built-in concurrency primitives: Goroutines and Channels
+* 命令式编程
+* 静态类型
+* 类似 C 的语法结构（但没有括号和分号）和 Oberon-2 的结构
+* 编译成机器码（没有 JVM）
+* 没有类，但是有带方法的结构体
+* 接口
+* 没有继承。有 [类型嵌入](http://golang.org/doc/effective%5Fgo.html#embedding)
+* 函数是一等公民
+* 函数可以有多个返回值
+* 有闭包
+* 有指针，但不支持指针运算
+* 内置并发特性：Goroutines 和 Channels
 
 # Basic Syntax
 
@@ -306,7 +306,7 @@ func main() {
     }
     for { // you can omit the condition ~ while (true)
     }
-    
+
     // use break/continue on current loop
     // use break/continue with label on outer loop
 here:
