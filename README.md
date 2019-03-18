@@ -16,9 +16,14 @@
 5. [内置数据类型](#内置数据类型)
 6. [类型转换](#类型转换)
 7. [Packages](#packages)
-8. [Control structures](#control-structures)
+8. [流程控制](#流程控制)
     * [If](#if)
     * [Loops](#loops)
+        * [键值循环](#键值循环)
+        * ~~fallthrough~~
+        * [goto](#goto)
+        * [break](#break)
+        * [continue](#continue)
     * [Switch](#switch)
 9. [数组，切片，范围](#数组-切片-范围)
     * [数组](#数组)
@@ -48,7 +53,7 @@
 
 多数代码摘自 [A Tour of Go](http://tour.golang.org/)，这是一个很好的 Go 入门站点。如果你是第一次接触 Go，建议你可以先去试验下。
 
-我不打算纯翻译英文版，在读《Go 语言从入门到进阶实战》的过程中，我从书中也摘抄了一些代码补充进来。
+我在保留英文版内容的基础上，补充了《Go 语言从入门到进阶实战》中的一些代码。
 
 ## Go 特性概览
 
@@ -139,8 +144,8 @@ const (
     c = 1 << iota
     d
 )
-    fmt.Println(a, b) // 1 2 (0 is skipped)
-    fmt.Println(c, d) // 8 16 (2^3, 2^4)
+fmt.Println(a, b) // 1 2 (0 is skipped)
+fmt.Println(c, d) // 8 16 (2^3, 2^4)
 ```
 
 ## Functions
@@ -273,7 +278,7 @@ u := uint(f)
 * Upper case identifier: exported (visible from other packages)
 * Lower case identifier: private (not visible from other packages)
 
-## Control structures
+## 流程控制
 
 ### If
 ```go
@@ -299,7 +304,13 @@ func main() {
 	val = "foo"
 	if str, ok := val.(string); ok {
 		fmt.Println(str)
-	}
+    }
+
+    // example 2
+    if err := Connect(); err != nil {
+        fmt.Println(err)
+        return
+    }
 }
 ```
 
@@ -344,42 +355,121 @@ there:
     }
 ```
 
+#### 键值循环
+for range 遍历数组、切片、字符串、map 以及通道 channel。
+
+```go
+for key, value := range []int{1, 2, 3, 4} {
+}
+
+for key, value := range "hello" {
+}
+
+for key, value := range map[string]int{ "hello": 100, "world": 200 } {
+}
+
+c := make(chan int)
+go func() {
+    c <- 1
+    c <- 2
+    c <- 3
+    close(c)
+}()
+for v := range c {
+    fmt.Println(v)
+}
+```
+
+#### goto
+快速跳出循环，避免重复。
+
+```go
+	err := firstCheckError()
+	if err != nil {
+		goto onExit
+	}
+	err = secondCheckError()
+	if err != nil {
+		goto onExit
+	}
+	fmt.Println("Done")
+	return
+onExit:
+	fmt.Println(err)
+	exitProcess()
+```
+
+#### break
+可以结束 for、swith、select 的代码块。break 后面添加标签，表示退出某个标签对应的代码块。
+
+```go
+OuterLoop:
+	for i := 0; i < 2; i++ {
+		for j := 0; j < 5; j++ {
+			switch j {
+			case 2:
+				fmt.Println(i, j)
+				break OuterLoop // 跳出指定循环
+			case 3:
+				fmt.Println(i, j)
+				break OuterLoop
+			}
+		}
+	}
+```
+
+#### continue
+结束当前循环，开始下一次循环迭代过程，仅限在 for 循环内使用。若 continue 后添加标签，表示开始标签对应的循环。
+
+```go
+OuterLoop:
+	for i := 0; i < 2; i++ {
+		for j := 0; j < 5; j++ {
+			switch j {
+			case 2:
+				fmt.Println(i, j)
+				continue OuterLoop // 开始下一次外层循环，i 变为 1
+			}
+		}
+	}
+```
+
 ### Switch
 ```go
-    // switch statement
-    switch operatingSystem {
-    case "darwin":
-        fmt.Println("Mac OS Hipster")
-        // cases break automatically, no fallthrough by default
-    case "linux":
-        fmt.Println("Linux Geek")
-    default:
-        // Windows, BSD, ...
-        fmt.Println("Other")
-    }
+// switch statement
+switch operatingSystem {
+case "darwin":
+    fmt.Println("Mac OS Hipster")
+    // cases break automatically, no fallthrough by default
+case "linux":
+    fmt.Println("Linux Geek")
+default:
+    // Windows, BSD, ...
+    fmt.Println("Other")
+}
 
-    // as with for and if, you can have an assignment statement before the switch value
-    switch os := runtime.GOOS; os {
-    case "darwin": ...
-    }
+// as with for and if, you can have an assignment statement before the switch value
+switch os := runtime.GOOS; os {
+case "darwin": ...
+}
 
-    // you can also make comparisons in switch cases
-    number := 42
-    switch {
-        case number < 42:
-            fmt.Println("Smaller")
-        case number == 42:
-            fmt.Println("Equal")
-        case number > 42:
-            fmt.Println("Greater")
-    }
+// you can also make comparisons in switch cases
+number := 42
+switch {
+    case number < 42:
+        fmt.Println("Smaller")
+    case number == 42:
+        fmt.Println("Equal")
+    case number > 42:
+        fmt.Println("Greater")
+}
 
-    // cases can be presented in comma-separated lists
-    var char byte = '?'
-    switch char {
-        case ' ', '?', '&', '=', '#', '+', '%':
-            fmt.Println("Should escape")
-    }
+// cases can be presented in comma-separated lists
+var char byte = '?'
+switch char {
+    case ' ', '?', '&', '=', '#', '+', '%':
+        fmt.Println("Should escape")
+}
 ```
 
 ## 数组-切片-范围
