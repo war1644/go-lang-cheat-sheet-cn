@@ -1,5 +1,7 @@
 # Go 小抄
 
+后面带 * 的都需要引入对应的包。
+
 # 索引
 1. [基础语法](#基础语法)
 2. [操作符](#操作符)
@@ -7,24 +9,27 @@
     * [Comparison](#comparison)
     * [Logical](#logical)
     * [Other](#other)
-3. [Declarations](#declarations)
+3. [声明](#声明)
 4. [Functions](#functions)
     * [Functions as values and closures](#functions-as-values-and-closures)
     * [Variadic Functions](#variadic-functions)
-5. [Built-in Types](#built-in-types)
-6. [Type Conversions](#type-conversions)
+5. [内置数据类型](#内置数据类型)
+6. [类型转换](#类型转换)
 7. [Packages](#packages)
 8. [Control structures](#control-structures)
     * [If](#if)
     * [Loops](#loops)
     * [Switch](#switch)
-9. [Arrays, Slices, Ranges](#arrays-slices-ranges)
-    * [Arrays](#arrays)
-    * [Slices](#slices)
-    * [Operations on Arrays and Slices](#operations-on-arrays-and-slices)
-10. [Maps](#maps)
+9. [数组，切片，范围](#数组-切片-范围)
+    * [数组](#数组)
+    * [切片](#切片)
+    * [数组和切片的操作](#数组和切片的操作)
+10. [映射，列表](#映射-列表)
+    * [映射](#映射)
+    * [sync.Map*](#sync.Map)
+    * [列表*](#列表)
 11. [Structs](#structs)
-12. [Pointers](#pointers)
+12. [指针](#指针)
 13. [Interfaces](#interfaces)
 14. [Embedding](#embedding)
 15. [Errors](#errors)
@@ -43,7 +48,7 @@
 
 多数代码摘自 [A Tour of Go](http://tour.golang.org/)，这是一个很好的 Go 入门站点。如果你是第一次接触 Go，建议你可以先去试验下。
 
-我不打算纯翻译英文版，在读《Go 语言从入门到进阶实战》的过程中，我从书中也摘抄了很多代码补充进来。
+我不打算纯翻译英文版，在读《Go 语言从入门到进阶实战》的过程中，我从书中也摘抄了一些代码补充进来。
 
 ## Go 特性概览
 
@@ -115,8 +120,8 @@ func main() {
 |`*`|dereference pointer|
 |`<-`|send / receive operator (see 'Channels' below)|
 
-## Declarations
-Type goes after identifier!
+## 声明
+类型在标识符后面！
 ```go
 var foo int // declaration without initialization
 var foo int = 42 // declaration with initialization
@@ -124,6 +129,7 @@ var foo, bar int = 42, 1302 // declare and init multiple vars at once
 var foo = 42 // type omitted, will be inferred
 foo := 42 // shorthand, only in func bodies, omit var keyword, type is always implicit
 const constant = "This is a constant"
+a, _ = GetData() // _ is anonymous variable, 不占用命名空间也不分配内存
 
 // iota can be used for incrementing numbers, starting from 0
 const (
@@ -229,8 +235,8 @@ func adder(args ...int) int {
 }
 ```
 
-## Built-in Types
-```
+## 内置数据类型
+```go
 bool
 
 string
@@ -238,17 +244,18 @@ string
 int  int8  int16  int32  int64
 uint uint8 uint16 uint32 uint64 uintptr
 
-byte // alias for uint8
+byte // uint8 的别名，代表了 ASCII 码的一个字符串
 
-rune // alias for int32 ~= a character (Unicode code point) - very Viking
+rune // int32 的别名 ~= 代表了一个 UTF-8 字符 (Unicode code point)
 
-float32 float64
+float32 float64 // IEEE 754
 
 complex64 complex128
 ```
 
-## Type Conversions
+## 类型转换
 ```go
+// T(表达式) - T 代表要转换的类型，表达式包括变量、复杂算子和函数返回值等
 var i int = 42
 var f float64 = float64(i)
 var u uint = uint(f)
@@ -375,44 +382,49 @@ there:
     }
 ```
 
-## Arrays, Slices, Ranges
+## 数组-切片-范围
 
-### Arrays
+### 数组
+数组是一段固定长度的连续内存区域。可以修改数组成员，数组大小不可变化。
 ```go
+// var 数组变量名 [元素数量]T - T 可以是任意基本类型，也可以是数组以实现多维数组
 var a [10]int // declare an int array with length 10. Array length is part of the type!
 a[3] = 42     // set elements
 i := a[3]     // read elements
 
 // declare and initialize
 var a = [2]int{1, 2}
-a := [2]int{1, 2} //shorthand
-a := [...]int{1, 2} // elipsis -> Compiler figures out array length
+a := [2]int{1, 2} // shorthand
+a := [...]int{1, 2} // `...` 表示让编译器确定数组大小
 ```
 
-### Slices
+### 切片
+切片是一个拥有相同类型元素的可变长度的序列。
 ```go
-var a []int                              // declare a slice - similar to an array, but length is unspecified
+// var name []T - T 代表切片元素类型，可以是整型、浮点型、布尔型、切片、map、函数等
+var a []int                              // declare a slice - similar to an array, but length is unspecified，默认值是 nil
 var a = []int {1, 2, 3, 4}               // declare and initialize a slice (backed by the array given implicitly)
 a := []int{1, 2, 3, 4}                   // shorthand
 chars := []string{0:"a", 2:"c", 1: "b"}  // ["a", "b", "c"]
 
+// slice[开始位置:结束位置] - 取出元素不包含结束位置
 var b = a[lo:hi]	// creates a slice (view of the array) from index lo to hi-1
 var b = a[1:4]		// slice from index 1 to 3
 var b = a[:3]		// missing low index implies 0
 var b = a[3:]		// missing high index implies len(a)
-a =  append(a,17,3)	// append items to slice a
-c := append(a,b...)	// concatenate slices a and b
+a = append(a, 17, 3)	// append items to slice a，容量扩容规律按容量的 2 倍数扩充，1、2、4、8、16
+c := append(a, b...)	// concatenate slices a and b
 
-// create a slice with make
-a = make([]byte, 5, 5)	// first arg length, second capacity
-a = make([]byte, 5)	// capacity is optional
+// make([]T, size, cap) - T 切片元素的类型，size 是为这个类型分配多少个元素，cap 预分配的元素数量只是提前分配空间优化性能。
+a = make([]byte, 5, 5) // first arg length, second capacity
+a = make([]byte, 5) // capacity is optional
 
 // create a slice from an array
 x := [3]string{"Лайка", "Белка", "Стрелка"}
 s := x[:] // a slice referencing the storage of x
 ```
 
-### Operations on Arrays and Slices
+### 数组和切片的操作
 `len(a)` gives you the length of an array/a slice. It's a built-in function, not a attribute/method on the array.
 
 ```go
@@ -435,22 +447,38 @@ for i := range a {
 for range time.Tick(time.Second) {
     // do it once a sec
 }
-
 ```
 
-## Maps
+`copy()` 复制切片元素到另一个切片
 
 ```go
+// copy(destSlice, srcSlice []T) int - srcSlice 为数据来源切片，srcSlice 为复制目标
+srcData := []int{1, 2, 3, 4, 5, 6}
+copyData := make([]int, 7)
+copy(copyData, srcData)
+fmt.Println(copyData) // [1 2 3 4 5 6 0]
+srcData[0] = 10
+copy(copyData, srcData[0:2]) // 复制是从 destSlice 的起始位置开始替换
+fmt.Println(copyData)  // [10 2 3 4 5 6 0]
+```
+
+## 映射-列表
+
+### 映射
+
+```go
+// map[KeyType]ValueType - KeyType 是键的类型 ValueType 是键对应值的类型
 var m map[string]int
 m = make(map[string]int)
 m["key"] = 42
 fmt.Println(m["key"])
+fmt.Println(m["none"]) // 0，查找一个不存在的键，返回的是 ValueType 的默认值
 
 delete(m, "key")
 
 elem, ok := m["key"] // test if key "key" is present and retrieve it, if so
 
-// map literal
+// map literal，声明时填充内容
 var m = map[string]Vertex{
     "Bell Labs": {40.68433, -74.39967},
     "Google":    {37.42202, -122.08408},
@@ -459,7 +487,41 @@ var m = map[string]Vertex{
 // iterate over map content
 for key, value := range m {
 }
+```
 
+### sync.Map
+map 在并发情况下，只读是线程安全，同时读写线程不安全。故需要使用 sync.Map
+
+```go
+var scene sync.Map
+scene.Store("greece", 97) // 不能使用 map 的方式取值和设置，使用 sync.Map 的方式
+scene.Store("london", 100) // Store 表示存储
+fmt.Println(scene.Load("london")) // Load 表示获取
+scene.Delete("london") // Delete 表示删除
+
+// 遍历需要提供一个匿名函数
+scene.Range(func(k, v interface{}) bool {
+  fmt.Println("iterate:", k, v)
+  return
+})
+```
+
+### 列表
+列表是一种非连续存储的容器，由多个节点组成，节点通过一些变量记录彼此间的关系。Go 使用双链表来实现列表以高效地进行任意位置的元素插入和删除操作。
+
+列表没有具体元素类型的限制。给一个列表放入了非期望类型的值，取出值后，将 `interfact{}` 转换为期望类型会发生宕机。
+```go
+// 变量名 := list.New() 或 var 变量名 list.List
+l := list.New()
+element := l.PushBack("first")
+l.PushFront(67)
+l.InsertAfter("high", element)
+l.InsertBefore("noon", element)
+l.Remove(element)
+
+for i := l.Front(); i != nil; i = i.Next() {
+    fmt.Println(i.Value)
+}
 ```
 
 ## Structs
@@ -507,15 +569,19 @@ point := struct {
 }{1, 2}
 ```
 
-## Pointers
+## 指针
+分为两个核心概念：
+1. 类型指针，允许对这个指针类型的数据进行修改。传递数据使用指针，而无须拷贝数据。类型指针不能进行偏移和运算。
+2. 切片，由指向起始元素的原始指针、元素数量和容量组成。
 ```go
 p := Vertex{1, 2}  // p is a Vertex
-q := &p            // q is a pointer to a Vertex
-r := &Vertex{1, 2} // r is also a pointer to a Vertex
+q := &p            // q is a pointer to a Vertex，`&` 操作符进行取地址操作
+r := &Vertex{1, 2} // r is also a pointer to a Vertex，r 的类型是 *Vertex
+value := *r        // value is `Vertex{1, 2}`, `*` 是从指针取值操作
+*r = Vertex{4, 6}  // * 操作符的根本意义就是操作指针指向的变量，在右侧是取变量的值，在左侧就是将值设置给指向的变量
 
-// The type of a pointer to a Vertex is *Vertex
-
-var s *Vertex = new(Vertex) // new creates a pointer to a new struct instance
+// Vertex 的指针类型是 *Vertex
+var s *Vertex = new(Vertex) // new(类型) 是创建指针的另外一种方法，指针指向的值为默认值
 ```
 
 ## Interfaces
