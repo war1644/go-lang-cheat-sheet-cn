@@ -39,10 +39,11 @@
 19. [Snippets](#snippets)
     * [Http-Server](#http-server)
 
-## Credits
+## 感谢
 
-Most example code taken from [A Tour of Go](http://tour.golang.org/), which is an excellent introduction to Go.
-If you're new to Go, do that tour. Seriously.
+多数代码摘自 [A Tour of Go](http://tour.golang.org/)，这是一个很好的 Go 入门站点。如果你是第一次接触 Go，建议你可以先去试验下。
+
+我不打算纯翻译英文版，在读《Go 语言从入门到进阶实战》的过程中，我从书中也摘抄了很多代码补充进来。
 
 ## Go 特性概览
 
