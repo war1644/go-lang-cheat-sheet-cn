@@ -10,10 +10,12 @@
     * [Logical](#logical)
     * [Other](#other)
 3. [声明](#声明)
-4. [Functions](#functions)
-    * [Functions as values and closures](#functions-as-values-and-closures)
-    * [Variadic Functions](#variadic-functions)
-5. [内置数据类型](#内置数据类型)
+4. [函数](#函数)
+    * [函数值](#函数值)
+    * [匿名函数](#匿名函数)
+    * [闭包](#闭包)
+    * [可变参数](#可变参数)
+5. [基础数据类型](#基础数据类型)
 6. [类型转换](#类型转换)
 7. [Packages](#packages)
 8. [流程控制](#流程控制)
@@ -48,6 +50,7 @@
     * [Examples](https://github.com/a8m/reflect-examples)
 19. [Snippets](#snippets)
     * [Http-Server](#http-server)
+    * [闭包实现生成器](#playergen)
 
 ## 感谢
 
@@ -148,7 +151,7 @@ fmt.Println(a, b) // 1 2 (0 is skipped)
 fmt.Println(c, d) // 8 16 (2^3, 2^4)
 ```
 
-## Functions
+## 函数
 ```go
 // a simple function
 func functionName() {}
@@ -181,7 +184,20 @@ var x, str = returnMulti2()
 
 ```
 
-### Functions As Values And Closures
+### 函数值
+函数像其他值一样，拥有类型，可以被赋值给其他变量，传递给函数，从函数返回。
+
+```go
+func fire() {
+}
+var f func()
+f = fire
+f()
+```
+
+### 匿名函数
+变量的生命周期不由它的作用域决定。
+
 ```go
 func main() {
     // assign a function to a name
@@ -190,8 +206,24 @@ func main() {
     }
     // use the name to call the function
     fmt.Println(add(3, 4))
-}
+}}
 
+// 匿名函数用作回调函数
+func visit(list []int, f func(int)) {
+    for _, v := range list {
+        f(v)
+    }
+}
+func main() {
+    visit([]{1, 2, 3, 4}, func(v int) {
+        fmt.Println(v)
+    })
+}
+```
+
+### 闭包
+引用了外部变量的匿名函数就是闭包。函数类型就像结构体一样，可以被实例化。函数是编译器静态的概念，闭包是运行期动态的概念。
+```go
 // Closures, lexically scoped: Functions can access values that were
 // in scope when defining the function
 func scope() func() int{
@@ -219,8 +251,9 @@ func outer() (func() int, int) {
 }
 ```
 
-### Variadic Functions
+### 可变参数
 ```go
+// func 函数名(固定参数列表, v ... T) (返回参数列表) - v 为可变参数类型为 []T, T 为 interface{} 时传入的可以是任意类型
 func main() {
 	fmt.Println(adder(1, 2, 3)) 	// 6
 	fmt.Println(adder(9, 9))	// 18
@@ -238,9 +271,22 @@ func adder(args ...int) int {
 	}
 	return total
 }
+
+// 在多个可变参数函数中传递参数，在传递时在可变参数变量后添加 ... 即可
+func rawPrint(rawList ...interface{}) {
+	for _, a := range rawList {
+		fmt.Println(a)
+	}
+}
+func print(slist ...interface{}) {
+	rawPrint(slist...)
+}
+func main() {
+	print(1, 2, 3)
+}
 ```
 
-## 内置数据类型
+## 基础数据类型
 ```go
 bool
 
@@ -904,4 +950,22 @@ func main() {
 // }
 ```
 
+## playergen
+```go
+package main
 
+import "fmt"
+
+func playerGen(name string) func() (string, int) {
+	hp := 150
+	return func() (string, int) {
+		return name, hp
+	}
+}
+func main() {
+	generator := playerGen("Victor")
+	name, hp := generator()
+	fmt.Println(name, hp) // Victor 15
+}
+
+```
