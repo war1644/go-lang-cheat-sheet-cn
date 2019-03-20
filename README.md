@@ -15,7 +15,9 @@
     * [匿名函数](#匿名函数)
     * [闭包](#闭包)
     * [可变参数](#可变参数)
-5. [基础数据类型](#基础数据类型)
+5. [数据类型](#数据类型)
+    * [基础数据类型](#基础数据类型)
+    * [自定义类型](#自定义类型)
 6. [类型转换](#类型转换)
 7. [Packages](#packages)
 8. [流程控制](#流程控制)
@@ -35,7 +37,9 @@
     * [映射](#映射)
     * [sync.Map*](#sync.Map)
     * [列表*](#列表)
-11. [Structs](#structs)
+11. [结构体](#结构体)
+    * [匿名结构体](#匿名结构体)
+    * [类型内嵌和结构体内嵌](#类型内嵌和结构体内嵌)
 12. [指针](#指针)
 13. [Interfaces](#interfaces)
 14. [Embedding](#embedding)
@@ -50,6 +54,8 @@
     * [Examples](https://github.com/a8m/reflect-examples)
 19. [Snippets](#snippets)
     * [Http-Server](#http-server)
+    * [函数封装结构体的初始化过](#函数封装结构体的初始化过程)
+    * [使用匿名结构体](#使用匿名结构体)
     * [闭包实现生成器](#playergen)
 
 ## 感谢
@@ -286,7 +292,8 @@ func main() {
 }
 ```
 
-## 基础数据类型
+## 数据类型
+### 基础数据类型
 ```go
 bool
 
@@ -302,6 +309,13 @@ rune // int32 的别名 ~= 代表了一个 UTF-8 字符 (Unicode code point)
 float32 float64 // IEEE 754
 
 complex64 complex128
+```
+
+### 自定义类型
+type 可以将各种基本类型定义为自定义类型。
+```go
+type MyInt int
+var m MyInt = 1
 ```
 
 ## 类型转换
@@ -660,9 +674,8 @@ for i := l.Front(); i != nil; i = i.Next() {
 }
 ```
 
-## Structs
-
-There are no classes, only structs. Structs can have methods.
+## 结构体
+Go 没有类，也不支持基于类的继承等面向对象的概念。只有结构体，结构体可以拥有自己的方法。
 ```go
 // A struct is a type. It's also a collection of fields
 
@@ -672,6 +685,11 @@ type Vertex struct {
 }
 
 // Creating
+var v Vertex // var ins T， ins 的类型是 T，属于值类型
+v := new(Vertex) // ins := new(T)，ins 的类型是 *T，属于指针
+v := &Vertex{} // ins := &T{}，ins 的类型是 *T，属于指针，这是最常用的方法
+
+// 初始化结构体的成员变量
 var v = Vertex{1, 2}
 var v = Vertex{X: 1, Y: 2} // Creates a struct by defining values with keys
 var v = []Vertex{{1,2},{5,2},{5,5}} // Initialize a slice of structs
@@ -679,9 +697,13 @@ var v = []Vertex{{1,2},{5,2},{5,5}} // Initialize a slice of structs
 // Accessing members
 v.X = 4
 
-// You can declare methods on structs. The struct you want to declare the
-// method on (the receiving type) comes between the the func keyword and
-// the method name. The struct is copied on each method call(!)
+// func(接收器变量 接收器类型) 方法名(参数列表) (返回参数) {} - 接收器类型可以是指针类型和值类型
+func (v *Vertex) setX(x int) {
+    v.x = x
+}
+func (v *Vertex) getX() int {
+    return v.x
+}
 func (v Vertex) Abs() float64 {
     return math.Sqrt(v.X*v.X + v.Y*v.Y)
 }
@@ -695,14 +717,36 @@ func (v *Vertex) add(n float64) {
     v.X += n
     v.Y += n
 }
-
 ```
-**Anonymous structs:**
+### 匿名结构体
 Cheaper and safer than using `map[string]interface{}`.
 ```go
 point := struct {
 	X, Y int
-}{1, 2}
+}{1, 2} // 可以不初始化成员
+```
+### 类型内嵌和结构体内嵌
+```go
+// 类型内嵌
+type Data struct {
+    int
+    float32
+    bool
+}
+ins := &Data{
+    int: 10,
+    float32: 3.14,
+    bool: true,
+}
+
+// 结构体内嵌
+type BasicColor struct {
+    R, G, B float32
+}
+type Color struct {
+    BasicColor
+    Alpha float32
+}
 ```
 
 ## 指针
@@ -950,6 +994,51 @@ func main() {
 // }
 ```
 
+## 函数封装结构体的初始化过程
+```go
+type Command struct {
+	Name    string
+	Var     *int
+	Comment string
+}
+
+func newCommand(name string, varref *int, comment string) *Command {
+	return &Command{
+		Name:    name,
+		Var:     varref,
+		Comment: comment,
+	}
+}
+
+func main() {
+	var version = 1
+	cmd := newCommand("version", &version, "show version")
+	fmt.Printf("%T, %d", cmd, cmd)
+}
+```
+
+## 使用匿名结构体
+
+```go
+func printMsgType(msg *struct {
+	id   int
+	data string
+}) {
+	fmt.Printf("%T\n", msg)
+}
+
+func main() {
+	msg := &struct {
+		id   int
+		data string
+	}{
+		1024,
+		"hello",
+	}
+	printMsgType(msg)
+}
+```
+
 ## playergen
 ```go
 package main
@@ -967,5 +1056,4 @@ func main() {
 	name, hp := generator()
 	fmt.Println(name, hp) // Victor 15
 }
-
 ```
