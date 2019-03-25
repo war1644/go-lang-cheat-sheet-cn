@@ -41,7 +41,7 @@
     * [匿名结构体](#匿名结构体)
     * [类型内嵌和结构体内嵌](#类型内嵌和结构体内嵌)
 12. [指针](#指针)
-13. [Interfaces](#interfaces)
+13. [接口](#接口)
 14. [Embedding](#embedding)
 15. [Errors](#errors)
 16. [Concurrency](#concurrency)
@@ -764,7 +764,7 @@ value := *r        // value is `Vertex{1, 2}`, `*` 是从指针取值操作
 var s *Vertex = new(Vertex) // new(类型) 是创建指针的另外一种方法，指针指向的值为默认值
 ```
 
-## Interfaces
+## 接口
 ```go
 // interface declaration
 type Awesomizer interface {
