@@ -661,10 +661,11 @@ scene.Range(func(k, v interface{}) bool {
 
 列表没有具体元素类型的限制。给一个列表放入了非期望类型的值，取出值后，将 `interfact{}` 转换为期望类型会发生宕机。
 ```go
+import "container/list"
 // 变量名 := list.New() 或 var 变量名 list.List
 l := list.New()
-element := l.PushBack("first")
-l.PushFront(67)
+element := l.PushBack("first") // 返回 *list.Element 结构
+l.PushFront(67) // 返回 *list.Element 结构
 l.InsertAfter("high", element)
 l.InsertBefore("noon", element)
 l.Remove(element)
