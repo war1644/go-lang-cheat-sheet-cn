@@ -618,7 +618,6 @@ fmt.Println(copyData)  // [10 2 3 4 5 6 0]
 
 ```go
 // map[KeyType]ValueType - KeyType 是键的类型 ValueType 是键对应值的类型
-var m map[string]int
 m = make(map[string]int)
 m["key"] = 42
 fmt.Println(m["key"])
