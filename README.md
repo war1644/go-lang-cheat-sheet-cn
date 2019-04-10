@@ -783,8 +783,38 @@ type Awesomizer interface {
 type Foo struct {}
 
 // instead, types implicitly satisfy an interface if they implement all required methods
-func (foo Foo) Awesomize() string {
+// Way 1:
+// func (foo Foo) Awesomize() string {
+//     return "Awesome!"
+// }
+// Way 2:
+func (foo *Foo) Awesomize() string {
     return "Awesome!"
+}
+```
+
+1. 函数的声明不能直接实现接口，需要将函数定义为类型后，使用类型实现结构体。当类型方法被调用时，还需要调用函数本身。
+2. 函数无需被实例化，只需将函数转换为对应函数类型即可。
+3. 函数来源可以是命名函数、匿名函数或闭包。
+4. **函数无法实现不带参数的接口方法。**
+5. **函数无法实现有返回值的接口方法。**
+
+```go
+type Awesomizer interface {
+	Awesomize(s string)
+}
+
+type FuncCaller func(s string)
+
+func (f FuncCaller) Awesomize(s string) {
+	f(s)
+}
+
+func main() {
+	a := FuncCaller(func(s string) {
+		fmt.Println(s)
+	})
+	a.Awesomize("fuck")
 }
 ```
 
