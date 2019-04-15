@@ -44,7 +44,7 @@
     * [类型内嵌和结构体内嵌](#类型内嵌和结构体内嵌)
 12. [指针](#指针)
 13. [接口](#接口)
-14. [Embedding](#embedding)
+14. [嵌入](#嵌入)
 15. [Errors](#errors)
 16. [Concurrency](#concurrency)
     * [Goroutines](#goroutines)
@@ -761,6 +761,8 @@ type Color struct {
 分为两个核心概念：
 1. 类型指针，允许对这个指针类型的数据进行修改。传递数据使用指针，而无须拷贝数据。类型指针不能进行偏移和运算。
 2. 切片，由指向起始元素的原始指针、元素数量和容量组成。
+
+使用 `new(类型)` 和 `&` 创建创建出来的对象均为指针。
 ```go
 p := Vertex{1, 2}  // p is a Vertex
 q := &p            // q is a pointer to a Vertex，`&` 操作符进行取地址操作
@@ -818,7 +820,7 @@ func main() {
 }
 ```
 
-## Embedding
+## 嵌入
 
 There is no subclassing in Go. Instead, there is interface and struct embedding.
 
