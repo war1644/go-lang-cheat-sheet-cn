@@ -10,6 +10,7 @@
     * [Logical](#logical)
     * [Other](#other)
 3. [声明](#声明)
+    * [枚举](#枚举)
 4. [函数](#函数)
     * [函数值](#函数值)
     * [匿名函数](#匿名函数)
@@ -146,17 +147,40 @@ var foo = 42 // type omitted, will be inferred
 foo := 42 // shorthand, only in func bodies, omit var keyword, type is always implicit
 const constant = "This is a constant"
 a, _ = GetData() // _ is anonymous variable, 不占用命名空间也不分配内存
+```
 
+### 枚举
+
+```go
 // iota can be used for incrementing numbers, starting from 0
 const (
     _ = iota
     a
     b
-    c = 1 << iota
+    c = 1 << iota // 左移一位
     d
 )
 fmt.Println(a, b) // 1 2 (0 is skipped)
 fmt.Println(c, d) // 8 16 (2^3, 2^4)
+```
+
+```go
+type Weapon int
+
+const (
+	Arrow Weapon = iota
+	Shuriken
+	SniperRifle
+	Rifle
+	Blower
+)
+
+func main() {
+	fmt.Println(Arrow, Blower) // 0 4
+
+	var weapon Weapon = Blower
+	fmt.Println(weapon) // 1
+}
 ```
 
 ## 函数
