@@ -196,9 +196,10 @@ var x, str = returnMulti2()
 函数像其他值一样，拥有类型，可以被赋值给其他变量，传递给函数，从函数返回。
 
 ```go
-func fire() {
+func fire() bool {
 }
-var f func()
+// 注意声明一个函数变量的时候，变量的类型签名和函数签名要一致，也就是说返回值也要属于类型的一部分。
+var f func() bool
 f = fire
 f()
 ```
