@@ -696,10 +696,10 @@ scene.Range(func(k, v interface{}) bool {
 import "container/list"
 // 变量名 := list.New() 或 var 变量名 list.List
 l := list.New()
-element := l.PushBack("first") // 返回 *list.Element 结构
-l.PushFront(67) // 返回 *list.Element 结构
-l.InsertAfter("high", element)
-l.InsertBefore("noon", element)
+element := l.PushBack("first") // 尾部添加元素后返回 *list.Element 结构
+l.PushFront(67) // 头部添加元素后返回 *list.Element 结构
+l.InsertAfter("high", element) // 在 element 前添加 high
+l.InsertBefore("noon", element) // 在 element 后添加 noon
 l.Remove(element)
 
 for i := l.Front(); i != nil; i = i.Next() {
